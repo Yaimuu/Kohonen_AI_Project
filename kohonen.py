@@ -261,7 +261,7 @@ class SOM:
 
   def auto_organising_mesuring(self):
     '''
-    @summary: Affichage de la distance maximale de neurones
+    @summary: Affichage de la distance moyenne entre les neurones
     '''
     mean = 0
     i = 0
@@ -271,7 +271,7 @@ class SOM:
           mean += n1.distance(n2)
         i += 1
     mean = mean/i
-    print(f"Distnance max du réseau : {mean} ")
+    print(f"Distance moyenne du réseau : {mean} ")
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
   # Création d'un réseau avec une entrée (2,1) et une carte (10,10)
