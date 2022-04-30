@@ -11,6 +11,7 @@
 # Pour que les divisions soient toutes réelles (pas de division entière)
 from __future__ import division
 import math
+from traceback import print_list
 from turtle import distance
 # Librairie de calcul matriciel
 import numpy
@@ -259,18 +260,33 @@ class SOM:
 
   #   print(f"Distnance max du réseau : {max_dist} ")
 
+  # def auto_organising_mesuring(self):
+  #   '''
+  #   @summary: Affichage de la distance moyenne entre les neurones
+  #   '''
+  #   mean = 0
+  #   i = 0
+  #   savedNeurons = []
+  #   for mline in self.map:
+  #     for n1 in mline:
+  #       for n2 in mline:
+  #         if n1 != n2 and n2 not in savedNeurons:
+  #           mean += n1.distance(n2)
+  #           i += 1
+  #       savedNeurons.append(n1)
+  #   mean = mean/(i*(i-1)/2)
+  #   print(f"Distance moyenne du réseau : {mean} ")
+
   def auto_organising_mesuring(self):
     '''
     @summary: Affichage de la distance moyenne entre les neurones
     '''
+    nb_neurons = self.gridsize[0] * self.gridsize[1]
     mean = 0
-    i = 0
-    for mline in self.map:
-      for n1 in mline:
-        for n2 in mline:
-          mean += n1.distance(n2)
-        i += 1
-    mean = mean/i
+    for amline in self.activitymap:
+      for y in amline:
+          mean += y
+    mean = mean/(nb_neurons*(nb_neurons-1)/2)
     print(f"Distance moyenne du réseau : {mean} ")
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -287,9 +303,9 @@ if __name__ == '__main__':
   N = 1000
   # Affichage interactif de l'évolution du réseau 
   #TODO à mettre à faux pour que les simulations aillent plus vite
-  VERBOSE = True
+  VERBOSE = False
   # Nombre de pas de temps avant rafraissichement de l'affichage
-  NAFFICHAGE = 1000
+  NAFFICHAGE = 100
   # DONNÉES D'APPRENTISSAGE
   # Nombre de données à générer pour les ensembles 1, 2 et 3
   # TODO décommenter les données souhaitées
@@ -341,7 +357,7 @@ if __name__ == '__main__':
 #  plt.scatter(samples[:,2,0].flatten(),samples[:,3,0].flatten(),c='k')
 #  plt.suptitle('Donnees apprentissage')
 #  plt.show()
-    
+  
   # SIMULATION
   # Affichage des poids du réseau
   network.plot()
