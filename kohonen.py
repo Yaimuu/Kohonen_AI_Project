@@ -279,7 +279,7 @@ class SOM:
 
   def auto_organising_mesuring(self):
     '''
-    @summary: Affichage de la distance moyenne entre les neurones
+    @summary: Affichage de la mesure d'auto-organisation moyenne entre les neurones
     '''
     nb_neurons = self.gridsize[0] * self.gridsize[1]
     mean = 0
@@ -287,7 +287,7 @@ class SOM:
       for y in amline:
           mean += y
     mean = mean/(nb_neurons*(nb_neurons-1)/2)
-    print(f"Distance moyenne du réseau : {mean} ")
+    print(f"Mesure d'auto-organisation du réseau : {mean} ")
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
   # Création d'un réseau avec une entrée (2,1) et une carte (10,10)
