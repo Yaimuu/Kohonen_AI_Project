@@ -277,17 +277,41 @@ class SOM:
   #   mean = mean/(i*(i-1)/2)
   #   print(f"Distance moyenne du réseau : {mean} ")
 
+  # def auto_organising_mesuring(self):
+  #   '''
+  #   @summary: Affichage de la mesure d'auto-organisation moyenne entre les neurones
+  #   '''
+  #   nb_neurons = self.gridsize[0] * self.gridsize[1]
+  #   mean = 0
+  #   for amline in self.activitymap:
+  #     for y in amline:
+  #         mean += y
+  #   mean = mean/(nb_neurons*(nb_neurons-1)/2)
+  #   print(f"Mesure d'auto-organisation du réseau : {mean} ")
+
   def auto_organising_mesuring(self):
     '''
-    @summary: Affichage de la mesure d'auto-organisation moyenne entre les neurones
+    @summary: Calcul de la moyenne des distances entre tous les neurones
     '''
-    nb_neurons = self.gridsize[0] * self.gridsize[1]
-    mean = 0
-    for amline in self.activitymap:
-      for y in amline:
-          mean += y
-    mean = mean/(nb_neurons*(nb_neurons-1)/2)
-    print(f"Mesure d'auto-organisation du réseau : {mean} ")
+    neurones = []
+    distances = []
+    nb_neurons = len(self.weightsmap)
+    for i in range(nb_neurons):
+      for j in range(nb_neurons):
+        x = self.weightsmap[i][j][0]
+        y = self.weightsmap[i][j][1]
+        neurones.append([x,y])
+
+    # savedNeurones est utilisé pour éviter de calculer deux fois la distance entre deux neurones (exemple : A,B et B,A)
+    savedNeurones = []
+    for n1 in neurones:
+      for n2 in neurones:
+        if n1 != n2 and n2 not in savedNeurones:
+          distance = math.dist([n1[0], n1[1]], [n2[0], n2[1]])
+          distances.append(distance)
+      savedNeurones.append(n1)
+    mean = numpy.mean(distances)
+    return mean
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
   # Création d'un réseau avec une entrée (2,1) et une carte (10,10)
@@ -295,23 +319,23 @@ if __name__ == '__main__':
   network = SOM((2,1),(10,10))
   # PARAMÈTRES DU RÉSEAU
   # Taux d'apprentissage
-  ETA = 0.1
+  ETA = 0.05
   # Largeur du voisinage
   SIGMA = 1.4
   # Nombre de pas de temps d'apprentissage
-  # N = 30000
-  N = 1000
-  # Affichage interactif de l'évolution du réseau 
+  N = 30000
+  # N = 1000
+  # Affichage interactif de l'évolution du réseau
   #TODO à mettre à faux pour que les simulations aillent plus vite
-  VERBOSE = False
+  VERBOSE = True
   # Nombre de pas de temps avant rafraissichement de l'affichage
-  NAFFICHAGE = 100
+  NAFFICHAGE = 1000
   # DONNÉES D'APPRENTISSAGE
   # Nombre de données à générer pour les ensembles 1, 2 et 3
   # TODO décommenter les données souhaitées
   nsamples = 1200
     # Ensemble de données 1
-  # samples = numpy.random.random((nsamples,2,1))*2-1
+  samples = numpy.random.random((nsamples,2,1))*2-1
     # Ensemble de données 2
   # samples1 = -numpy.random.random((nsamples//3,2,1))
   # samples2 = numpy.random.random((nsamples//3,2,1))
@@ -320,11 +344,11 @@ if __name__ == '__main__':
   # samples3[:,1,:] -= 1
   # samples = numpy.concatenate((samples1,samples2,samples3))
     # Ensemble de données 3
-  samples1 = numpy.random.random((nsamples//2,2,1))
-  samples1[:,0,:] -= 1
-  samples2 = numpy.random.random((nsamples//2,2,1))
-  samples2[:,1,:] -= 1
-  samples = numpy.concatenate((samples1,samples2))
+  # samples1 = numpy.random.random((nsamples//2,2,1))
+  # samples1[:,0,:] -= 1
+  # samples2 = numpy.random.random((nsamples//2,2,1))
+  # samples2[:,1,:] -= 1
+  # samples = numpy.concatenate((samples1,samples2))
     # Ensemble de données 4
   # x = []
   # y = []
@@ -396,4 +420,4 @@ if __name__ == '__main__':
   network.plot()
   # Affichage de l'erreur de quantification vectorielle moyenne après apprentissage
   print("erreur de quantification vectorielle moyenne ",network.MSE(samples))
-  network.auto_organising_mesuring()
+  print("mesure d'auto-organisation du réseau ",network.auto_organising_mesuring())
