@@ -247,47 +247,29 @@ class SOM:
     # On renvoie l'erreur de quantification vectorielle moyenne
     return s/nsamples
 
-  # def auto_organising_mesuring(self):
-  #   '''
-  #   @summary: Affichage de la distance maximale de neurones
-  #   '''
-  #   max_dist = 0
-  #   for mline in self.map:
-  #     for n1 in mline:
-  #       for n2 in mline:
-  #         dist = n1.distance(n2)
-  #         max_dist = dist if max_dist < dist else max_dist
-
-  #   print(f"Distnance max du réseau : {max_dist} ")
-
-  # def auto_organising_mesuring(self):
-  #   '''
-  #   @summary: Affichage de la distance moyenne entre les neurones
-  #   '''
-  #   mean = 0
-  #   i = 0
-  #   savedNeurons = []
-  #   for mline in self.map:
-  #     for n1 in mline:
-  #       for n2 in mline:
-  #         if n1 != n2 and n2 not in savedNeurons:
-  #           mean += n1.distance(n2)
-  #           i += 1
-  #       savedNeurons.append(n1)
-  #   mean = mean/(i*(i-1)/2)
-  #   print(f"Distance moyenne du réseau : {mean} ")
-
   def auto_organising_mesuring(self):
     '''
-    @summary: Affichage de la mesure d'auto-organisation moyenne entre les neurones
+    @summary: Calcul de la moyenne des distances entre tous les neurones
     '''
-    nb_neurons = self.gridsize[0] * self.gridsize[1]
-    mean = 0
-    for amline in self.activitymap:
-      for y in amline:
-          mean += y
-    mean = mean/(nb_neurons*(nb_neurons-1)/2)
-    print(f"Mesure d'auto-organisation du réseau : {mean} ")
+    neurones = []
+    distances = []
+    nb_neurons = len(self.weightsmap)
+    for i in range(nb_neurons):
+      for j in range(nb_neurons):
+        x = self.weightsmap[i][j][0]
+        y = self.weightsmap[i][j][1]
+        neurones.append([x,y])
+
+    # savedNeurones est utilisé pour éviter de calculer deux fois la distance entre deux neurones (exemple : A,B et B,A)
+    savedNeurones = []
+    for n1 in neurones:
+      for n2 in neurones:
+        if n1 != n2 and n2 not in savedNeurones:
+          distance = math.dist([n1[0], n1[1]], [n2[0], n2[1]])
+          distances.append(distance)
+      savedNeurones.append(n1)
+    mean = numpy.mean(distances)
+    return mean
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
   # Création d'un réseau avec une entrée (2,1) et une carte (10,10)
@@ -299,13 +281,13 @@ if __name__ == '__main__':
   # Largeur du voisinage
   SIGMA = 1.4
   # Nombre de pas de temps d'apprentissage
-  # N = 30000
-  N = 1000
+  N = 30000
+  # N = 1000
   # Affichage interactif de l'évolution du réseau 
   #TODO à mettre à faux pour que les simulations aillent plus vite
-  VERBOSE = False
+  VERBOSE = True
   # Nombre de pas de temps avant rafraissichement de l'affichage
-  NAFFICHAGE = 100
+  NAFFICHAGE = 500
   # DONNÉES D'APPRENTISSAGE
   # Nombre de données à générer pour les ensembles 1, 2 et 3
   # TODO décommenter les données souhaitées
@@ -320,21 +302,29 @@ if __name__ == '__main__':
   # samples3[:,1,:] -= 1
   # samples = numpy.concatenate((samples1,samples2,samples3))
     # Ensemble de données 3
-  samples1 = numpy.random.random((nsamples//2,2,1))
-  samples1[:,0,:] -= 1
-  samples2 = numpy.random.random((nsamples//2,2,1))
-  samples2[:,1,:] -= 1
-  samples = numpy.concatenate((samples1,samples2))
-    # Ensemble de données 4
-  # x = []
-  # y = []
-  # for theta in numpy.linspace(0,nsamples * numpy.pi):
-  #     r = ((theta)**2)
-  #     x.append(r*math.cos(theta))
-  #     y.append(r*math.sin(theta))
-  # samples1 = x
-  # samples2 = y
-  # samples = 
+  # samples1 = numpy.random.random((nsamples//2,2,1))
+  # samples1[:,0,:] -= 1
+  # samples2 = numpy.random.random((nsamples//2,2,1))
+  # samples2[:,1,:] -= 1
+  # samples = numpy.concatenate((samples1,samples2))
+    # Ensemble de données 4 (Sigmoïde)
+  i = 0
+  theta = numpy.zeros((nsamples,2,1))
+  for t in numpy.linspace(-numpy.pi,numpy.pi, nsamples):
+    r = t**2
+    theta[i,0,:] = r * numpy.cos(t) / (numpy.pi*2) + 0.75
+    theta[i,1,:] = r * numpy.sin(t) / (numpy.pi*2)
+    i += 1
+  samples = theta
+    # Ensemble de données 5 (Spirale)
+  # i = 0
+  # theta = numpy.zeros((nsamples,2,1))
+  # for t in numpy.linspace(-numpy.pi*10,numpy.pi*10, nsamples):
+  #   r = t**2
+  #   theta[i,0,:] = i * numpy.cos(t) / nsamples
+  #   theta[i,1,:] = i * numpy.sin(t) / nsamples
+  #   i += 1
+  # samples = theta
     # Ensemble de données robotiques
 #  samples = numpy.random.random((nsamples,4,1))
 #  samples[:,0:2,:] *= numpy.pi
@@ -357,7 +347,7 @@ if __name__ == '__main__':
 #  plt.scatter(samples[:,2,0].flatten(),samples[:,3,0].flatten(),c='k')
 #  plt.suptitle('Donnees apprentissage')
 #  plt.show()
-  
+  # exit()
   # SIMULATION
   # Affichage des poids du réseau
   network.plot()
@@ -396,4 +386,4 @@ if __name__ == '__main__':
   network.plot()
   # Affichage de l'erreur de quantification vectorielle moyenne après apprentissage
   print("erreur de quantification vectorielle moyenne ",network.MSE(samples))
-  network.auto_organising_mesuring()
+  print("mesure d'auto-organisation du réseau ",network.auto_organising_mesuring())
