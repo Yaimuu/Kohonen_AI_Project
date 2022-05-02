@@ -277,7 +277,7 @@ if __name__ == '__main__':
   network = SOM((2,1),(10,10))
   # PARAMÈTRES DU RÉSEAU
   # Taux d'apprentissage
-  ETA = 0.1
+  ETA = 0.05
   # Largeur du voisinage
   SIGMA = 1.4
   # Nombre de pas de temps d'apprentissage
@@ -293,7 +293,7 @@ if __name__ == '__main__':
   # TODO décommenter les données souhaitées
   nsamples = 1200
     # Ensemble de données 1
-  # samples = numpy.random.random((nsamples,2,1))*2-1
+  samples = numpy.random.random((nsamples,2,1))*2-1
     # Ensemble de données 2
   # samples1 = -numpy.random.random((nsamples//3,2,1))
   # samples2 = numpy.random.random((nsamples//3,2,1))
