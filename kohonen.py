@@ -249,18 +249,18 @@ class SOM:
 
   def auto_organising_mesuring(self):
     '''
-    @summary: Calcul de la moyenne des distances entre tous les neurones
+    @summary: Calcul de la variances des distances entre les poids des neurones
     '''
     neurones = []
     distances = []
-    nb_neurons = len(self.weightsmap)
-    for i in range(nb_neurons):
-      for j in range(nb_neurons):
+    for i in range(self.gridsize[0]):
+      for j in range(self.gridsize[1]):
         x = self.weightsmap[i][j][0]
         y = self.weightsmap[i][j][1]
         neurones.append([x,y])
 
-    # savedNeurones est utilisé pour éviter de calculer deux fois la distance entre deux neurones (exemple : A,B et B,A)
+    # savedNeurones est utilisé pour éviter de calculer deux fois la distance entre deux poids de neurones
+    # (exemple : A,B et B,A)
     savedNeurones = []
     for n1 in neurones:
       for n2 in neurones:
@@ -268,7 +268,7 @@ class SOM:
           distance = math.dist([n1[0], n1[1]], [n2[0], n2[1]])
           distances.append(distance)
       savedNeurones.append(n1)
-    mean = numpy.mean(distances)
+    mean = numpy.var(distances)
     return mean
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -287,7 +287,7 @@ if __name__ == '__main__':
   #TODO à mettre à faux pour que les simulations aillent plus vite
   VERBOSE = True
   # Nombre de pas de temps avant rafraissichement de l'affichage
-  NAFFICHAGE = 500
+  NAFFICHAGE = 1000
   # DONNÉES D'APPRENTISSAGE
   # Nombre de données à générer pour les ensembles 1, 2 et 3
   # TODO décommenter les données souhaitées
@@ -308,14 +308,14 @@ if __name__ == '__main__':
   # samples2[:,1,:] -= 1
   # samples = numpy.concatenate((samples1,samples2))
     # Ensemble de données 4 (Sigmoïde)
-  i = 0
-  theta = numpy.zeros((nsamples,2,1))
-  for t in numpy.linspace(-numpy.pi,numpy.pi, nsamples):
-    r = t**2
-    theta[i,0,:] = r * numpy.cos(t) / (numpy.pi*2) + 0.75
-    theta[i,1,:] = r * numpy.sin(t) / (numpy.pi*2)
-    i += 1
-  samples = theta
+  # i = 0
+  # theta = numpy.zeros((nsamples,2,1))
+  # for t in numpy.linspace(-numpy.pi,numpy.pi, nsamples):
+  #   r = t**2
+  #   theta[i,0,:] = r * numpy.cos(t) / (numpy.pi*2) + 0.75
+  #   theta[i,1,:] = r * numpy.sin(t) / (numpy.pi*2)
+  #   i += 1
+  # samples = theta
     # Ensemble de données 5 (Spirale)
   # i = 0
   # theta = numpy.zeros((nsamples,2,1))
