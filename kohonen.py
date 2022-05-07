@@ -274,7 +274,7 @@ class SOM:
 if __name__ == '__main__':
   # Création d'un réseau avec une entrée (2,1) et une carte (10,10)
   #TODO mettre à jour la taille des données d'entrée pour les données robotiques
-  network = SOM((2,1),(10,10))
+  network = SOM((4,1),(10,10))
   # PARAMÈTRES DU RÉSEAU
   # Taux d'apprentissage
   ETA = 0.05
@@ -293,7 +293,7 @@ if __name__ == '__main__':
   # TODO décommenter les données souhaitées
   nsamples = 1200
     # Ensemble de données 1
-  samples = numpy.random.random((nsamples,2,1))*2-1
+  # samples = numpy.random.random((nsamples,2,1))*2-1
     # Ensemble de données 2
   # samples1 = -numpy.random.random((nsamples//3,2,1))
   # samples2 = numpy.random.random((nsamples//3,2,1))
@@ -326,28 +326,28 @@ if __name__ == '__main__':
   #   i += 1
   # samples = theta
     # Ensemble de données robotiques
-#  samples = numpy.random.random((nsamples,4,1))
-#  samples[:,0:2,:] *= numpy.pi
-#  l1 = 0.7
-#  l2 = 0.3
-#  samples[:,2,:] = l1*numpy.cos(samples[:,0,:])+l2*numpy.cos(samples[:,0,:]+samples[:,1,:])
-#  samples[:,3,:] = l1*numpy.sin(samples[:,0,:])+l2*numpy.sin(samples[:,0,:]+samples[:,1,:])
+  samples = numpy.random.random((nsamples,4,1))
+  samples[:,0:2,:] *= numpy.pi
+  l1 = 0.7
+  l2 = 0.3
+  samples[:,2,:] = l1*numpy.cos(samples[:,0,:])+l2*numpy.cos(samples[:,0,:]+samples[:,1,:])
+  samples[:,3,:] = l1*numpy.sin(samples[:,0,:])+l2*numpy.sin(samples[:,0,:]+samples[:,1,:])
   # Affichage des données (pour les ensembles 1, 2 et 3)
+  # plt.figure()
+  # plt.scatter(samples[:,0,0], samples[:,1,0])
+  # plt.xlim(-1,1)
+  # plt.ylim(-1,1)
+  # plt.suptitle('Donnees apprentissage')
+  # plt.show()
+  # Affichage des données (pour l'ensemble robotique)
   plt.figure()
-  plt.scatter(samples[:,0,0], samples[:,1,0])
-  plt.xlim(-1,1)
-  plt.ylim(-1,1)
+  plt.subplot(1,2,1)
+  plt.scatter(samples[:,0,0].flatten(),samples[:,1,0].flatten(),c='k')
+  plt.subplot(1,2,2)
+  plt.scatter(samples[:,2,0].flatten(),samples[:,3,0].flatten(),c='k')
   plt.suptitle('Donnees apprentissage')
   plt.show()
-  # Affichage des données (pour l'ensemble robotique)
-#  plt.figure()
-#  plt.subplot(1,2,1)
-#  plt.scatter(samples[:,0,0].flatten(),samples[:,1,0].flatten(),c='k')
-#  plt.subplot(1,2,2)
-#  plt.scatter(samples[:,2,0].flatten(),samples[:,3,0].flatten(),c='k')
-#  plt.suptitle('Donnees apprentissage')
-#  plt.show()
-  # exit()
+
   # SIMULATION
   # Affichage des poids du réseau
   network.plot()
@@ -374,7 +374,7 @@ if __name__ == '__main__':
       plt.clf()
       # Remplissage de la figure
       # TODO à remplacer par scatter_plot_2 pour les données robotiques
-      network.scatter_plot(True)
+      network.scatter_plot_2(True)
       # Affichage du contenu de la figure
       plt.pause(0.00001)
       plt.draw()
