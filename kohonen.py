@@ -282,10 +282,10 @@ class SOM:
 
   def getClosestNeuron(self, pos, type = 0):
     '''
-    @summary: Recherche du neurone le plus proche de la position (motrice ou spatiale) passée en entrée
+    @summary: Recherche du neurone le plus proche de la position passée en entrée
     @param pos: Coordonnées (x, y) du point choisi
     @type pos: numpy.array
-    @param type: Indique le type de la position (spatiale = 0, motrice = 1)
+    @param type: Indique le type de la position à retourner (spatiale = 0, motrice = 1)
     @type type: int
     '''
 
@@ -295,7 +295,7 @@ class SOM:
 
     # Tous les poids de la carte
     weights = numpy.array(self.weightsmap)
-    # Par défaut, on considère que la position transmise en paramètre est spatiale
+    # Par défaut, on considère que la position récherché est spatiale
     quad_pos = [2, 3]
     if type == 1:
       quad_pos = [0, 1]
@@ -311,10 +311,6 @@ class SOM:
           target_neuron = [i, j]
     # On retourne le poids le plus proche de l'entrée
     n = weights[target_neuron[0]][target_neuron[1]]
-
-    # Affichage du point d'entrée en bleu et de sa prédiction en rouge
-    # plt.plot(pos[0], pos[1], 'bo', lw=5)
-    # plt.plot(n[quad_pos[0]], n[quad_pos[1]], 'ro', lw=5)
 
     return numpy.array([n[quad_pos[0]], n[quad_pos[1]]])
 
@@ -489,11 +485,11 @@ if __name__ == '__main__':
   print("Mesure d'auto-organisation du réseau ",network.auto_organising_mesuring())
 
   pos_bras = numpy.array((1, 1))
-  estimated_mot = network.getClosestNeuron(pos_bras, 0)
+  estimated_mot = network.getClosestNeuron(pos_bras, 1)
 
   print(f"Position du bras : (x1, x2), {pos_bras} - Position motrice estimée : (t1, t2), {estimated_mot}")
 
   pos_mot = numpy.array((0.75, 0.25))
-  estimated_bras = network.getClosestNeuron(pos_mot, 1)
+  estimated_bras = network.getClosestNeuron(pos_mot, 0)
 
   print(f"Position motrice : (t1, t2), {pos_mot} - Position du bras estimée : (x1, x2), {estimated_bras}")
