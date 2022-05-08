@@ -179,8 +179,8 @@ class SOM:
     plt.subplot(1,2,1)
     # Affichage de la droite générée à partir de deux positions motrices
     if prediction:
-      firstPos = numpy.array((0.5, 0.5))
-      secondPos = numpy.array((2, 2))
+      firstPos = numpy.array((-0.5, 0))
+      secondPos = numpy.array((2, 2.5))
       xdata, ydata = network.buildFirstPolynome(firstPos, secondPos)
     # Récupération des poids
     w = numpy.array(self.weightsmap)
@@ -310,7 +310,12 @@ class SOM:
           target_neuron = [i, j]
     # On retourne le poids le plus proche de l'entrée
     n = weights[target_neuron[0]][target_neuron[1]]
-    return numpy.array([n[0], n[1]])
+
+    # Affichage du point d'entrée en bleu et de sa prédiction en rouge
+    # plt.plot(pos[0], pos[1], 'bo', lw=5)
+    # plt.plot(n[quad_pos[0]], n[quad_pos[1]], 'ro', lw=5)
+
+    return numpy.array([n[quad_pos[0]], n[quad_pos[1]]])
 
   def predictFollowingPositions(self, xdata, ydata):
     '''
@@ -325,7 +330,7 @@ class SOM:
 
     for i in range (len(xdata)):
       pos = numpy.array((xdata[i], ydata[i]))
-      closestNeuron = self.getClosestNeuron(pos, 1)
+      closestNeuron = self.getClosestNeuron(pos, 0)
       newDataX.append(closestNeuron[0])
       newDataY.append(closestNeuron[1])
 
@@ -370,7 +375,7 @@ if __name__ == '__main__':
   # Largeur du voisinage
   SIGMA = 1.4
   # Nombre de pas de temps d'apprentissage
-  N = 3000
+  N = 30000
   # N = 1000
   # Affichage interactif de l'évolution du réseau 
     #TODO à mettre à faux pour que les simulations aillent plus vite
