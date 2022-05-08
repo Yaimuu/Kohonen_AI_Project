@@ -11,9 +11,6 @@
 # Pour que les divisions soient toutes réelles (pas de division entière)
 from __future__ import division
 import math
-from tkinter.tix import MAX
-from traceback import print_list
-from turtle import distance
 from xmlrpc.client import MAXINT
 # Librairie de calcul matriciel
 import numpy
@@ -169,7 +166,7 @@ class SOM:
     if not interactive:
       plt.show()
 
-  def scatter_plot_2(self,interactive=False):
+  def scatter_plot_2(self,interactive=False, prediction=False):
     '''
     @summary: Affichage du réseau dans l'espace d'entrée en 2 fois 2d (utilisable dans le cas d'entrée à quatre dimensions et d'une carte avec une topologie de grille carrée)
     @param interactive: Indique si l'affichage se fait en mode interactif
@@ -180,6 +177,11 @@ class SOM:
       plt.figure()
     # Affichage des 2 premières dimensions dans le plan
     plt.subplot(1,2,1)
+    # Affichage de la droite générée à partir de deux positions motrices
+    if prediction:
+      firstPos = numpy.array((0.5, 0.5))
+      secondPos = numpy.array((2, 2))
+      xdata, ydata = network.buildFirstPolynome(firstPos, secondPos)
     # Récupération des poids
     w = numpy.array(self.weightsmap)
     # Affichage des poids
@@ -191,6 +193,11 @@ class SOM:
       plt.plot(w[:,i,0],w[:,i,1],'k',linewidth=1.)
     # Affichage des 2 dernières dimensions dans le plan
     plt.subplot(1,2,2)
+
+    # Affichage de la courbe prédisant la suite des positions spatiales
+    if prediction:
+      network.predictFollowingPositions(xdata, ydata)
+
     # Récupération des poids
     w = numpy.array(self.weightsmap)
     # Affichage des poids
@@ -273,32 +280,84 @@ class SOM:
     mean = numpy.var(distances)
     return mean
 
-  def getClosestNeuron(self, pos : numpy.array, type = 0):
+  def getClosestNeuron(self, pos, type = 0):
     '''
-    @summary: Recherche du neuronne le plus proche de la position de la carte passée en entrée
+    @summary: Recherche du neurone le plus proche de la position (motrice ou spatiale) passée en entrée
     @param pos: Coordonnées (x, y) du point choisi
+    @type pos: numpy.array
+    @param type: Indique le type de la position (spatiale = 0, motrice = 1)
+    @type type: int
     '''
+
     # Coordonées x et y du neuronne cible
     target_neuron = []
     min = MAXINT
+
     # Tous les poids de la carte
-    weigths = numpy.array(self.weightsmap)
+    weights = numpy.array(self.weightsmap)
     quad_pos = [2, 3]
-    if(type == 1):
+    if type == 1:
       quad_pos = [0, 1]
     
-    for i in range(weigths.shape[0]):
-      for j in range(weigths.shape[1]):
-        # Poid courant
-        x = numpy.array((weigths[i, j, quad_pos[0]], weigths[i, j, quad_pos[1]]))
-        # On cherche le neuronne ayant le poid le plus proche de l'entrée
+    for i in range(weights.shape[0]):
+      for j in range(weights.shape[1]):
+        # Poids courant
+        x = numpy.array((weights[i, j, quad_pos[0]], weights[i, j, quad_pos[1]]))
+        # On cherche le neurone ayant le poids le plus proche de l'entrée
         distance = math.dist(pos, x)
-        if(min > distance):
+        if min > distance:
           min = distance
           target_neuron = [i, j]
-    # On retourne le poid le plus proche de l'entrée
-    n = weigths[target_neuron[0]][target_neuron[1]]
+    # On retourne le poids le plus proche de l'entrée
+    n = weights[target_neuron[0]][target_neuron[1]]
     return numpy.array([n[0], n[1]])
+
+  def predictFollowingPositions(self, xdata, ydata):
+    '''
+    @summary: Prediction de la suite des positions spatiales prise par la main à partir d'un ensemble de positions motrices
+    @param xdata: Ensemble des abscisses des positions motrices
+    @type xdata: ndarray
+    @param ydata: Ensemble des abscisses des positions motrices
+    @type ydata: list
+    '''
+    newDataX = []
+    newDataY = []
+
+    for i in range (len(xdata)):
+      pos = numpy.array((xdata[i], ydata[i]))
+      closestNeuron = self.getClosestNeuron(pos, 1)
+      newDataX.append(closestNeuron[0])
+      newDataY.append(closestNeuron[1])
+
+    # Affichage de la droite composée de l'ensemble des points générés
+    plt.plot(newDataX, newDataY, 'g', lw=5)
+
+
+  def buildFirstPolynome(self, firstPos, secondPos):
+    '''
+    @summary: Construction d'un ensemble de positions motrices à partir de deux points
+    @param firstPos: Coordonnées (x, y) de la première position
+    @type firstPos: numpy.array
+    @param secondPos: Coordonnées (x, y) de la deuxième position
+    @type secondPos: numpy.array
+    '''
+    x = [firstPos[0], secondPos[0]]
+    y = [firstPos[1], secondPos[1]]
+
+    # Création de l'équation de la droite
+    coef = numpy.polyfit(x, y, 1)
+    polynome = numpy.poly1d(coef)
+
+    # Fabrication des points
+    xdata = numpy.linspace(x[0], x[1], 7)
+    ydata = polynome(xdata)
+
+    # Affichage de la droite composée de l'ensemble des points générés
+    plt.plot(xdata, ydata, 'g', lw=5)
+    plt.plot(x[0], y[0], 'ro', lw=5)
+    plt.plot(x[1], y[1], 'ro', lw=5)
+
+    return xdata, ydata
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -311,11 +370,11 @@ if __name__ == '__main__':
   # Largeur du voisinage
   SIGMA = 1.4
   # Nombre de pas de temps d'apprentissage
-  N = 30000
+  N = 3000
   # N = 1000
   # Affichage interactif de l'évolution du réseau 
     #TODO à mettre à faux pour que les simulations aillent plus vite
-  VERBOSE = False
+  VERBOSE = True
   # Nombre de pas de temps avant rafraissichement de l'affichage
   NAFFICHAGE = 1000
   # DONNÉES D'APPRENTISSAGE
@@ -413,6 +472,10 @@ if __name__ == '__main__':
   if VERBOSE:
     # Désactivation du mode interactif
     plt.ioff()
+
+  network.scatter_plot_2(True, True)
+  plt.draw()
+
   # Affichage des poids du réseau
   network.plot()
   # Affichage de l'erreur de quantification vectorielle moyenne après apprentissage
