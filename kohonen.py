@@ -295,6 +295,7 @@ class SOM:
 
     # Tous les poids de la carte
     weights = numpy.array(self.weightsmap)
+    # Par défaut, on considère que la position transmise en paramètre est spatiale
     quad_pos = [2, 3]
     if type == 1:
       quad_pos = [0, 1]
@@ -370,7 +371,7 @@ if __name__ == '__main__':
   # Largeur du voisinage
   SIGMA = 1.4
   # Nombre de pas de temps d'apprentissage
-  N = 3000
+  N = 10000
   # N = 1000
   # Affichage interactif de l'évolution du réseau 
     #TODO à mettre à faux pour que les simulations aillent plus vite
