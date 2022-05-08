@@ -274,17 +274,28 @@ class SOM:
     return mean
 
   def getClosestNeuron(self, pos : numpy.array):
+    '''
+    @summary: Recherche du neuronne le plus proche de la position de la carte passée en entrée
+    @param pos: Coordonnées (x, y) du point choisi
+    '''
+    # Coordonées x et y du neuronne cible
     target_neuron = []
     min = MAXINT
-    neurons = numpy.array(numpy.array_split(self.weightsmap[1][1], 2))
+    # Tous les poids de la carte
+    weigths = numpy.array(self.weightsmap)
     
-    for i in range(len(neurons)):
-        n = neurons[i]
-        distance = math.dist([n[0], n[1]], [pos[0], pos[1]])
+    for i in range(weigths.shape[0]):
+      for j in range(weigths.shape[1]):
+        # Poid courant
+        x = numpy.array((weigths[i, j, 2], weigths[i, j, 3]))
+        # On cherche le neuronne ayant le poid le plus proche de l'entrée
+        distance = math.dist(pos, x)
         if(min > distance):
           min = distance
-          target_neuron = n
-    return target_neuron
+          target_neuron = [i, j]
+    # On retourne le poid le plus proche de l'entrée
+    n = weigths[target_neuron[0]][target_neuron[1]]
+    return numpy.array([n[0], n[1]])
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -297,8 +308,8 @@ if __name__ == '__main__':
   # Largeur du voisinage
   SIGMA = 1.4
   # Nombre de pas de temps d'apprentissage
-  N = 30000
-  # N = 1000
+  # N = 30000
+  N = 1000
   # Affichage interactif de l'évolution du réseau 
     #TODO à mettre à faux pour que les simulations aillent plus vite
   VERBOSE = False
