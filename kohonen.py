@@ -273,7 +273,7 @@ class SOM:
     mean = numpy.var(distances)
     return mean
 
-  def getClosestNeuron(self, pos : numpy.array):
+  def getClosestNeuron(self, pos : numpy.array, type = 0):
     '''
     @summary: Recherche du neuronne le plus proche de la position de la carte passée en entrée
     @param pos: Coordonnées (x, y) du point choisi
@@ -283,11 +283,14 @@ class SOM:
     min = MAXINT
     # Tous les poids de la carte
     weigths = numpy.array(self.weightsmap)
+    quad_pos = [2, 3]
+    if(type == 1):
+      quad_pos = [0, 1]
     
     for i in range(weigths.shape[0]):
       for j in range(weigths.shape[1]):
         # Poid courant
-        x = numpy.array((weigths[i, j, 2], weigths[i, j, 3]))
+        x = numpy.array((weigths[i, j, quad_pos[0]], weigths[i, j, quad_pos[1]]))
         # On cherche le neuronne ayant le poid le plus proche de l'entrée
         distance = math.dist(pos, x)
         if(min > distance):
@@ -308,8 +311,8 @@ if __name__ == '__main__':
   # Largeur du voisinage
   SIGMA = 1.4
   # Nombre de pas de temps d'apprentissage
-  # N = 30000
-  N = 1000
+  N = 30000
+  # N = 1000
   # Affichage interactif de l'évolution du réseau 
     #TODO à mettre à faux pour que les simulations aillent plus vite
   VERBOSE = False
@@ -416,12 +419,12 @@ if __name__ == '__main__':
   print("Erreur de quantification vectorielle moyenne ",network.MSE(samples))
   print("Mesure d'auto-organisation du réseau ",network.auto_organising_mesuring())
 
-  pos_bras = numpy.array((3, 3))
-  estimated_mot = network.getClosestNeuron(pos_bras)
+  pos_bras = numpy.array((1, 1))
+  estimated_mot = network.getClosestNeuron(pos_bras, 0)
 
   print(f"Position du bras : (x1, x2), {pos_bras} - Position motrice estimée : (t1, t2), {estimated_mot}")
 
-  pos_mot = numpy.array((0, 0.5))
-  estimated_bras = network.getClosestNeuron(pos_mot)
+  pos_mot = numpy.array((0.75, 0.25))
+  estimated_bras = network.getClosestNeuron(pos_mot, 1)
 
   print(f"Position motrice : (t1, t2), {pos_mot} - Position du bras estimée : (x1, x2), {estimated_bras}")
