@@ -11,8 +11,10 @@
 # Pour que les divisions soient toutes réelles (pas de division entière)
 from __future__ import division
 import math
+from tkinter.tix import MAX
 from traceback import print_list
 from turtle import distance
+from xmlrpc.client import MAXINT
 # Librairie de calcul matriciel
 import numpy
 # Librairie d'affichage
@@ -270,11 +272,40 @@ class SOM:
       savedNeurones.append(n1)
     mean = numpy.mean(distances)
     return mean
+
+  def anglesFromHand(self, initial_neuron : numpy.array):
+    target_neuron = []
+    # neurons = numpy.array([])
+    min = MAXINT
+    neurons = numpy.array(numpy.array_split(self.weightsmap[1][1], 2))
+    print(neurons)
+    for i in range(len(neurons)):
+        n = neurons[i]
+        distance = math.dist([n[0], n[1]], [initial_neuron[0], initial_neuron[1]])
+        if(min > distance):
+          min = distance
+          target_neuron = n
+    return target_neuron
+
+  def handFromAngles(self, theta : numpy.array):
+    target_neuron = []
+    # neurons = numpy.array([])
+    min = MAXINT
+    neurons = numpy.array(numpy.array_split(self.weightsmap[1][1], 2))
+    print(neurons)
+    for i in range(len(neurons)):
+        n = neurons[i]
+        distance = math.dist([n[0], n[1]], [theta[0], theta[1]])
+        if(min > distance):
+          min = distance
+          target_neuron = n
+    return target_neuron
+
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
   # Création d'un réseau avec une entrée (2,1) et une carte (10,10)
-  #TODO mettre à jour la taille des données d'entrée pour les données robotiques
-  network = SOM((2,1),(10,10))
+    #TODO mettre à jour la taille des données d'entrée pour les données robotiques
+  network = SOM((4,1),(10,10))
   # PARAMÈTRES DU RÉSEAU
   # Taux d'apprentissage
   ETA = 0.05
@@ -284,16 +315,17 @@ if __name__ == '__main__':
   N = 30000
   # N = 1000
   # Affichage interactif de l'évolution du réseau 
-  #TODO à mettre à faux pour que les simulations aillent plus vite
-  VERBOSE = True
+    #TODO à mettre à faux pour que les simulations aillent plus vite
+  VERBOSE = False
   # Nombre de pas de temps avant rafraissichement de l'affichage
-  NAFFICHAGE = 500
+  NAFFICHAGE = 1000
   # DONNÉES D'APPRENTISSAGE
   # Nombre de données à générer pour les ensembles 1, 2 et 3
-  # TODO décommenter les données souhaitées
+    # TODO décommenter les données souhaitées
   nsamples = 1200
     # Ensemble de données 1
-  samples = numpy.random.random((nsamples,2,1))*2-1
+  # samples = numpy.random.random((nsamples,2,1))*2-1
+  # print(samples)
     # Ensemble de données 2
   # samples1 = -numpy.random.random((nsamples//3,2,1))
   # samples2 = numpy.random.random((nsamples//3,2,1))
@@ -308,14 +340,14 @@ if __name__ == '__main__':
   # samples2[:,1,:] -= 1
   # samples = numpy.concatenate((samples1,samples2))
     # Ensemble de données 4 (Sigmoïde)
-  i = 0
-  theta = numpy.zeros((nsamples,2,1))
-  for t in numpy.linspace(-numpy.pi,numpy.pi, nsamples):
-    r = t**2
-    theta[i,0,:] = r * numpy.cos(t) / (numpy.pi*2) + 0.75
-    theta[i,1,:] = r * numpy.sin(t) / (numpy.pi*2)
-    i += 1
-  samples = theta
+  # i = 0
+  # theta = numpy.zeros((nsamples,2,1))
+  # for t in numpy.linspace(-numpy.pi,numpy.pi, nsamples):
+  #   r = t**2
+  #   theta[i,0,:] = r * numpy.cos(t) / (numpy.pi*2) + 0.75
+  #   theta[i,1,:] = r * numpy.sin(t) / (numpy.pi*2)
+  #   i += 1
+  # samples = theta
     # Ensemble de données 5 (Spirale)
   # i = 0
   # theta = numpy.zeros((nsamples,2,1))
@@ -326,27 +358,27 @@ if __name__ == '__main__':
   #   i += 1
   # samples = theta
     # Ensemble de données robotiques
-#  samples = numpy.random.random((nsamples,4,1))
-#  samples[:,0:2,:] *= numpy.pi
-#  l1 = 0.7
-#  l2 = 0.3
-#  samples[:,2,:] = l1*numpy.cos(samples[:,0,:])+l2*numpy.cos(samples[:,0,:]+samples[:,1,:])
-#  samples[:,3,:] = l1*numpy.sin(samples[:,0,:])+l2*numpy.sin(samples[:,0,:]+samples[:,1,:])
+  samples = numpy.random.random((nsamples,4,1))
+  samples[:,0:2,:] *= numpy.pi
+  l1 = 0.7
+  l2 = 0.3
+  samples[:,2,:] = l1*numpy.cos(samples[:,0,:])+l2*numpy.cos(samples[:,0,:]+samples[:,1,:])
+  samples[:,3,:] = l1*numpy.sin(samples[:,0,:])+l2*numpy.sin(samples[:,0,:]+samples[:,1,:])
   # Affichage des données (pour les ensembles 1, 2 et 3)
+  # plt.figure()
+  # plt.scatter(samples[:,0,0], samples[:,1,0])
+  # plt.xlim(-1,1)
+  # plt.ylim(-1,1)
+  # plt.suptitle('Donnees apprentissage')
+  # plt.show()
+    # Affichage des données (pour l'ensemble robotique)
   plt.figure()
-  plt.scatter(samples[:,0,0], samples[:,1,0])
-  plt.xlim(-1,1)
-  plt.ylim(-1,1)
+  plt.subplot(1,2,1)
+  plt.scatter(samples[:,0,0].flatten(),samples[:,1,0].flatten(),c='k')
+  plt.subplot(1,2,2)
+  plt.scatter(samples[:,2,0].flatten(),samples[:,3,0].flatten(),c='k')
   plt.suptitle('Donnees apprentissage')
   plt.show()
-  # Affichage des données (pour l'ensemble robotique)
-#  plt.figure()
-#  plt.subplot(1,2,1)
-#  plt.scatter(samples[:,0,0].flatten(),samples[:,1,0].flatten(),c='k')
-#  plt.subplot(1,2,2)
-#  plt.scatter(samples[:,2,0].flatten(),samples[:,3,0].flatten(),c='k')
-#  plt.suptitle('Donnees apprentissage')
-#  plt.show()
   # exit()
   # SIMULATION
   # Affichage des poids du réseau
@@ -373,8 +405,9 @@ if __name__ == '__main__':
       # Effacement du contenu de la figure
       plt.clf()
       # Remplissage de la figure
-      # TODO à remplacer par scatter_plot_2 pour les données robotiques
-      network.scatter_plot(True)
+        # TODO à remplacer par scatter_plot_2 pour les données robotiques
+      # network.scatter_plot(True)
+      network.scatter_plot_2(True)
       # Affichage du contenu de la figure
       plt.pause(0.00001)
       plt.draw()
@@ -385,5 +418,15 @@ if __name__ == '__main__':
   # Affichage des poids du réseau
   network.plot()
   # Affichage de l'erreur de quantification vectorielle moyenne après apprentissage
-  print("erreur de quantification vectorielle moyenne ",network.MSE(samples))
-  print("mesure d'auto-organisation du réseau ",network.auto_organising_mesuring())
+  print("Erreur de quantification vectorielle moyenne ",network.MSE(samples))
+  print("Mesure d'auto-organisation du réseau ",network.auto_organising_mesuring())
+
+  pos_bras = numpy.array((3, 3))
+  estimated_mot = network.anglesFromHand(pos_bras)
+
+  print(f"Position du bras : (x1, x2), {pos_bras} - Position motrice estimée : (t1, t2), {estimated_mot}")
+
+  pos_mot = numpy.array((0, 0.5))
+  estimated_bras = network.handFromAngles(pos_mot)
+
+  print(f"Position motrice : (t1, t2), {pos_mot} - Position du bras estimée : (x1, x2), {estimated_bras}")
