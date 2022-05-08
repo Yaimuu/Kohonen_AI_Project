@@ -273,29 +273,14 @@ class SOM:
     mean = numpy.var(distances)
     return mean
 
-  def anglesFromHand(self, initial_neuron : numpy.array):
+  def getClosestNeuron(self, pos : numpy.array):
     target_neuron = []
-    # neurons = numpy.array([])
     min = MAXINT
     neurons = numpy.array(numpy.array_split(self.weightsmap[1][1], 2))
-    print(neurons)
+    
     for i in range(len(neurons)):
         n = neurons[i]
-        distance = math.dist([n[0], n[1]], [initial_neuron[0], initial_neuron[1]])
-        if(min > distance):
-          min = distance
-          target_neuron = n
-    return target_neuron
-
-  def handFromAngles(self, theta : numpy.array):
-    target_neuron = []
-    # neurons = numpy.array([])
-    min = MAXINT
-    neurons = numpy.array(numpy.array_split(self.weightsmap[1][1], 2))
-    print(neurons)
-    for i in range(len(neurons)):
-        n = neurons[i]
-        distance = math.dist([n[0], n[1]], [theta[0], theta[1]])
+        distance = math.dist([n[0], n[1]], [pos[0], pos[1]])
         if(min > distance):
           min = distance
           target_neuron = n
@@ -421,11 +406,11 @@ if __name__ == '__main__':
   print("Mesure d'auto-organisation du réseau ",network.auto_organising_mesuring())
 
   pos_bras = numpy.array((3, 3))
-  estimated_mot = network.anglesFromHand(pos_bras)
+  estimated_mot = network.getClosestNeuron(pos_bras)
 
   print(f"Position du bras : (x1, x2), {pos_bras} - Position motrice estimée : (t1, t2), {estimated_mot}")
 
   pos_mot = numpy.array((0, 0.5))
-  estimated_bras = network.handFromAngles(pos_mot)
+  estimated_bras = network.getClosestNeuron(pos_mot)
 
   print(f"Position motrice : (t1, t2), {pos_mot} - Position du bras estimée : (x1, x2), {estimated_bras}")
